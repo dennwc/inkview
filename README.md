@@ -1,0 +1,1 @@
+Go SDK for Pocketbook based on libinkview.
