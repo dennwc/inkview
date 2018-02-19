@@ -9,13 +9,17 @@ package ink
 import "C"
 
 import (
+	"errors"
 	"fmt"
 )
 
+// HwAddress returns device MAC address.
 func HwAddress() string {
 	return C.GoString(C.GetHwAddress())
 }
 
+// Connections returns all available network connections.
+// Name can be used as an argument to Connect.
 func Connections() []string {
 	list := C.EnumConnections()
 	return strArr(list)
@@ -58,4 +62,27 @@ func Disconnect() error {
 
 func OpenNetworkInfo() {
 	C.OpenNetworkInfo()
+}
+
+var (
+	ErrNoConnections = errors.New("no connections available")
+)
+
+// KeepNetwork will connect a default network interface on the device and will keep it enabled.
+// Returned function can be called to disconnect an interface.
+func KeepNetwork() (func(), error) {
+	conns := Connections()
+	if len(conns) == 0 {
+		return nil, ErrNoConnections
+	}
+	var last error
+	for _, c := range conns {
+		last = Connect(c)
+		if last == nil {
+			return func() {
+				_ = Disconnect()
+			}, nil
+		}
+	}
+	return nil, last
 }

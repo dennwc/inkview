@@ -1,6 +1,7 @@
 package ink
 
 import (
+	"bytes"
 	"fmt"
 	"image"
 )
@@ -15,18 +16,51 @@ func NewLog(r image.Rectangle, sz int) *Log {
 type Log struct {
 	clip    image.Rectangle
 	font    *Font
-	lines   []string
-	h       int
-	Spacing int
+	lines   []string // lines buffer
+	w       int      // font width (since we use monospaced font)
+	h       int      // font height
+	Spacing int      // line spacing
 }
 
 func (l *Log) Close() {
 	l.font.Close()
 	l.lines = nil
 }
-
+func (l *Log) appendLine(line string) {
+	h := l.clip.Size().Y
+	lh := l.h + l.Spacing
+	n := h / lh
+	if h%lh != 0 {
+		n++
+	}
+	if dn := len(l.lines) + 1 - n; dn > 0 {
+		// remove exceeding lines
+		copy(l.lines, l.lines[dn:])
+		l.lines = l.lines[:len(l.lines)-dn]
+	}
+	l.lines = append(l.lines, line)
+}
+func (l *Log) Write(p []byte) (int, error) {
+	lines := bytes.Split(p, []byte{'\n'})
+	if len(lines) != 0 && len(l.lines) != 0 {
+		// append string to the last line
+		li := len(l.lines) - 1
+		last := l.lines[li]
+		l.lines = l.lines[:li]
+		l.appendLine(last + string(lines[0]))
+		lines = lines[1:]
+	}
+	// add new lines
+	for _, line := range lines {
+		l.appendLine(string(line))
+	}
+	return len(p), nil
+}
 func (l *Log) Draw() {
 	l.font.SetActive(Black)
+	if l.w == 0 {
+		l.w = CharWidth('a')
+	}
 	FillArea(l.clip, White)
 	h := l.clip.Size().Y
 	if h < l.h {
@@ -37,9 +71,6 @@ func (l *Log) Draw() {
 		s := l.lines[i]
 		h -= l.h + l.Spacing
 		if h < 0 {
-			n := len(l.lines)
-			copy(l.lines, l.lines[i+1:])
-			l.lines = l.lines[:n-(i+1)]
 			break
 		}
 		if s == "" {
@@ -51,8 +82,8 @@ func (l *Log) Draw() {
 }
 
 func (l *Log) WriteString(s string) error {
-	l.lines = append(l.lines, s)
-	return nil
+	_, err := l.Write([]byte(s))
+	return err
 }
 
 func (l *Log) Println(args ...interface{}) error {

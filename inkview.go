@@ -9,53 +9,105 @@ extern int main_handler(int t, int p1, int p2);
 #cgo LDFLAGS: -pthread -lpthread -linkview
 */
 import "C"
-import "image"
+import (
+	"image"
+	"sync"
+)
 
-type Handler func(e Event)
+var (
+	mainMu  sync.Mutex
+	mainApp App
 
-var mainHandler Handler
+	errMu   sync.Mutex
+	mainErr error
+)
+
+func SetErr(err error) {
+	errMu.Lock()
+	mainErr = err
+	errMu.Unlock()
+}
 
 // Run starts main event loop. It should be called before calling any other function.
-func Run(h Handler) {
-	if h == nil {
-		panic("no handler")
+func Run(app App) error {
+	if app == nil {
+		panic("no app")
 	}
-	mainHandler = h
+	mainMu.Lock()
+	defer mainMu.Unlock()
+	SetErr(nil)
+
+	mainApp = app
 	C.InkViewMain(C.iv_handler(C.main_handler))
+
+	errMu.Lock()
+	err := mainErr
+	errMu.Unlock()
+	return err
+}
+
+func handleEvent(typ int, p1, p2 int) bool {
+	switch typ {
+	case C.EVT_INIT:
+		if err := mainApp.Init(); err != nil {
+			mainErr = err
+			Exit()
+		}
+		return true
+	case C.EVT_EXIT:
+		if err := mainApp.Close(); err != nil {
+			mainErr = err
+		}
+		return true
+	case C.EVT_SHOW:
+		mainApp.Draw()
+		return true
+	//case C.EVT_HIDE:
+	//case C.EVT_FOREGROUND:
+	//	return mainApp.Show()
+	//case C.EVT_BACKGROUND:
+	//	return mainApp.Hide()
+	case C.EVT_ORIENTATION:
+		return mainApp.Orientation(Orientation(p1))
+	default:
+		switch {
+		case typ >= C.EVT_KEYDOWN && typ <= C.EVT_KEYREPEAT:
+			return mainApp.Key(KeyEvent{
+				Key:   Key(p1),
+				State: KeyState(typ),
+			})
+		case typ >= C.EVT_POINTERUP && typ <= C.EVT_POINTERHOLD:
+			return mainApp.Pointer(PointerEvent{
+				Point: image.Pt(p1, p2),
+				State: PointerState(typ),
+			})
+		case typ >= C.EVT_TOUCHUP && typ <= C.EVT_TOUCHMOVE:
+			return mainApp.Touch(TouchEvent{
+				Point: image.Pt(p1, p2),
+				State: TouchState(typ),
+			})
+		}
+	}
+	return false
 }
 
 //export goMainHandler
 func goMainHandler(typ int, p1, p2 int) int {
-	var e Event = UnknownEvent{Type: typ, P1: p1, P2: p2}
-	switch typ {
-	case 38, 39:
-		return 0
-	case C.EVT_INIT:
-		e = InitEvent{}
-	case C.EVT_EXIT:
-		e = ExitEvent{}
-	default:
-		switch {
-		case typ >= C.EVT_KEYDOWN && typ <= C.EVT_KEYREPEAT:
-			e = KeyEvent{Key: Key(p1), State: KeyState(typ)}
-		case typ >= C.EVT_POINTERUP && typ <= C.EVT_POINTERHOLD:
-			e = PointerEvent{Point: image.Pt(p1, p2), State: PointerState(typ)}
-		case typ >= C.EVT_TOUCHUP && typ <= C.EVT_TOUCHMOVE:
-			e = TouchEvent{Point: image.Pt(p1, p2), State: TouchState(typ)}
-		}
+	if handleEvent(typ, p1, p2) {
+		return 1
 	}
-	mainHandler(e)
 	return 0
 }
 
-func OpenScreen() {
-	C.OpenScreen()
-}
+//func OpenScreen() {
+//	C.OpenScreen()
+//}
 
-func OpenScreenExt() {
-	C.OpenScreenExt()
-}
+//func OpenScreenExt() {
+//	C.OpenScreenExt()
+//}
 
-func Close() {
+// Exit can be called to exit an application event loop.
+func Exit() {
 	C.CloseApp()
 }

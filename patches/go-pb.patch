@@ -1,0 +1,11 @@
+--- build.go	2018-02-10 21:34:30.152052311 +0200
++++ build.go	2018-02-10 21:37:02.217443227 +0200
+@@ -3829,7 +3829,7 @@
+ func (b *Builder) disableBuildID(ldflags []string) []string {
+ 	switch cfg.Goos {
+ 	case "android", "dragonfly", "linux", "netbsd":
+-		ldflags = append(ldflags, "-Wl,--build-id=none")
++		// ldflags = append(ldflags, "-Wl,--build-id=none")
+ 	}
+ 	return ldflags
+ }

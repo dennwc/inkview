@@ -33,6 +33,7 @@ func colorToInt(cl color.Color) int {
 	return (int(b>>8) & 0xff) + int((g>>8)&0xff)<<8 + int((r>>8)&0xff)<<16
 }
 
+// ClearScreen fills current canvas with white color.
 func ClearScreen() {
 	C.ClearScreen()
 }
@@ -78,8 +79,4 @@ func DimArea(r image.Rectangle, cl color.Color) {
 func DrawSelection(r image.Rectangle, cl color.Color) {
 	sz := r.Size()
 	C.DrawSelection(C.int(r.Min.X), C.int(r.Min.Y), C.int(sz.X), C.int(sz.Y), C.int(colorToInt(cl)))
-}
-
-func Repaint() {
-	C.Repaint()
 }

@@ -9,45 +9,20 @@ package ink
 import "C"
 import "image"
 
-type Event interface {
-	isEvent()
-}
-
-type UnknownEvent struct {
-	Type   int
-	P1, P2 int
-}
-
-func (UnknownEvent) isEvent() {}
-
-type InitEvent struct{}
-
-func (InitEvent) isEvent() {}
-
-type ExitEvent struct{}
-
-func (ExitEvent) isEvent() {}
-
 type KeyEvent struct {
 	Key   Key
 	State KeyState
 }
-
-func (KeyEvent) isEvent() {}
 
 type PointerEvent struct {
 	image.Point
 	State PointerState
 }
 
-func (PointerEvent) isEvent() {}
-
 type TouchEvent struct {
 	image.Point
 	State TouchState
 }
-
-func (TouchEvent) isEvent() {}
 
 type KeyState int
 
@@ -97,4 +72,13 @@ const (
 	KeyNext   = Key(C.KEY_NEXT)
 	KeyPrev2  = Key(C.KEY_PREV2)
 	KeyNext2  = Key(C.KEY_NEXT2)
+)
+
+type Orientation int
+
+const (
+	Orientation0   = Orientation(C.ROTATE0)
+	Orientation90  = Orientation(C.ROTATE90)
+	Orientation180 = Orientation(C.ROTATE180)
+	Orientation270 = Orientation(C.ROTATE270)
 )
