@@ -23,19 +23,44 @@ application to actually see an output of you program (like
 The second option is to wrap the program into `RunCLI` - it will
 emulate terminal output and write it to device display.
 
+## Preparation - Build the Docker Image
+
+For your convenience there is a `docker-compose.yaml`.
+
+```bash
+docker-compose build
+```
+
+will ctreate a `pb-go` container which can be used to compile a go program.
+
+Adjust the `source` path in `docker-compose.yaml` to you needs.
+
+With the current settings you can compile an sqlite test program:
+
+```bash
+docker-compose run --rm pb-go build go-sqlite.go
+```
+
+Alternatively, after building the image, `docker` can be used to compile without adjusting the file.
+
 ## Build an app with UI
 
 To build your app or any example, run (requires Docker):
 
 ```bash
+cd ./examples/sqlitetst/
+docker run --rm -v $PWD:/app inkview_pb-go build go-sqlite.go
+```
+
+```bash
 cd ./examples/devinfo/
-docker run --rm -v $PWD:/app dennwc/pocketbook-go-sdk main.go
+docker run --rm -v $PWD:/app inkview_pb-go build main.go
 ```
 
 You may also need to mount GOPATH to container to build your app:
 
 ```
-docker run --rm -v $PWD:/app -v $GOPATH:/gopath dennwc/pocketbook-go-sdk main.go
+docker run --rm -v $PWD:/app -v $GOPATH:/gopath inkview_pb-go build main.go
 ```
 
 To run an binary, copy it into `applications/app-name.app` folder
