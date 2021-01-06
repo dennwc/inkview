@@ -1,4 +1,4 @@
-module github.com/Skeeve/sqlitetst
+module sqlitetst
 
 go 1.15
 
