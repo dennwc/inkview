@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  pb-go:
+    image: dennwc/pocketbook-go-sdk
+    build:
+      context: .
+    entrypoint:
+    - /go/bin/go
+    command:
+    - build
+    volumes:
+    - type: bind
+      source: ./examples
+      target: /app

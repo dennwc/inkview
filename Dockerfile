@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
 
 RUN apt-get update && \
-    apt-get install -y xz-utils build-essential libc6-i386 wget nano && \
+    apt-get install -y xz-utils build-essential libc6-i386 wget nano git && \
     apt-get clean
 
 # download Pocketbook SDK
@@ -28,7 +28,17 @@ RUN wget https://dl.google.com/go/go1.9.4.linux-amd64.tar.gz -qO /tmp/go.tar.gz 
 WORKDIR /app
 VOLUME /app
 
-ADD build.sh /
-ENTRYPOINT ["/build.sh"]
+ENTRYPOINT ["/go/bin/go"]
+CMD ["build"]
 
 ADD ./* /gopath/src/github.com/dennwc/inkview/
+
+ARG CC=arm-none-linux-gnueabi-gcc
+ARG GOOS=linux
+ARG GOARCH=arm
+ARG GOARM=5
+ARG CGO_ENABLED=1
+
+ENV GOROOT=/go GOPATH=/gopath PATH="/go/bin:$PATH" CC=${CC} GOOS=${GOOS} GOARCH=${GOARCH} GOARM=${GOARM} CGO_ENABLED=${CGO_ENABLED}
+
+RUN go get github.com/mattn/go-sqlite3
