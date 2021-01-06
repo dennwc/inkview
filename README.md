@@ -31,7 +31,7 @@ For your convenience there is a `docker-compose.yaml`.
 docker-compose build
 ```
 
-will ctreate a `pocketbook-go-sdk` container which can be used to compile a go program.
+will ctreate a `pb-go` container which can be used to compile a go program.
 
 Adjust the `source` path in `docker-compose.yaml` to your needs.
 
@@ -40,11 +40,11 @@ With the current settings you can compile the test programs.
 E.g.:
 
 ```bash
-docker-compose run --rm pocketbook-go-sdk build ./sqlitetst.dir/sqlitetst.go
+docker-compose run --rm pb-go build ./sqlitetst.dir/sqlitetst.go
 ```
 
 ```bash
-docker-compose run --rm pocketbook-go-sdk build ./devinfo/main.go
+docker-compose run --rm pb-go build ./devinfo/main.go
 ```
 
 Alternatively, after building the image, `docker` can be used to compile without adjusting the file.
@@ -55,19 +55,19 @@ To build your app or any example, run (requires Docker):
 
 ```bash
 cd ./examples/sqlitetst.dir/
-docker run --rm -v $PWD:/app dennwc_pocketbook-go-sdk build -o sqlitetst.app
+docker run --rm -v $PWD:/app dennwc/pocketbook-go-sdk build -o sqlitetst.app
 ```
 
 ```bash
 cd ./examples/devinfo/
-docker run --rm -v $PWD:/app dennwc_pocketbook-go-sdk
+docker run --rm -v $PWD:/app dennwc/pocketbook-go-sdk
 mv app devinfo.app
 ```
 
 You may also need to mount GOPATH to container to build your app:
 
 ```
-docker run --rm -v $PWD:/app -v $GOPATH:/gopath dennwc_pocketbook-go-sdk
+docker run --rm -v $PWD:/app -v $GOPATH:/gopath dennwc/pocketbook-go-sdk
 ```
 
 To run an binary, copy it into `applications/app-name.app` folder
