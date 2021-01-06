@@ -29,6 +29,7 @@ WORKDIR /app
 VOLUME /app
 
 ENTRYPOINT ["/go/bin/go"]
+CMD ["build"]
 
 ADD ./* /gopath/src/github.com/dennwc/inkview/
 

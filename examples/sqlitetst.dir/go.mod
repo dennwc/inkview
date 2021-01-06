@@ -1,4 +1,4 @@
-module hradek.net/go-sqlite
+module github.com/Skeeve/sqlitetst
 
 go 1.15
 
