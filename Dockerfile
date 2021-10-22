@@ -1,5 +1,9 @@
 FROM 5keeve/pocketbook-sdk:6.3.0-b288-v1
 
+LABEL maintainer="https://github.com/Skeeve"
+
+ARG GOLANG_VERSION=17.2
+
 RUN apt-get update && \
     apt-get install -y xz-utils git curl && \
     apt-get clean
@@ -11,9 +15,9 @@ ADD ./patches/* /tmp/
 # download sources for that release and apply the patch
 # build a new toolchain and remove an old one
 RUN mkdir /gosrc \
- && curl --silent https://dl.google.com/go/go1.15.6.linux-amd64.tar.gz | tar xvzf - --directory=/ \
- && curl --silent https://dl.google.com/go/go1.15.6.src.tar.gz         | tar xvzf - --directory=/gosrc \
- && patch /gosrc/go/src/cmd/go/internal/work/build.go < /tmp/go-pb.patch \
+ && curl https://dl.google.com/go/go1.17.2.linux-amd64.tar.gz | tar xzf - --directory=/ \
+ && curl https://dl.google.com/go/go1.17.2.src.tar.gz         | tar xzf - --directory=/gosrc \
+ && patch /gosrc/go/src/cmd/go/internal/work/exec.go < /tmp/go-pb.patch \
  && patch /gosrc/go/src/net/dnsconfig_unix.go < /tmp/dns-pb.patch \
  && cd /gosrc/go/src && GOROOT_BOOTSTRAP=/go ./make.bash  \
  && rm -r /go && mv /gosrc/go /go && rm -r /gosrc \
