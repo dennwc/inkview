@@ -13,7 +13,7 @@ func main() {
 	os.Chdir(filepath.Dir("/mnt/ext1"))
 	os.Remove("/mnt/ext1/sqlite-database.db") // I delete the file to avoid duplicated records. SQLite is a file based database.
 
-	log.Println("Creating /mnt/ext1/sqlite-database.db...")
+	log.Println("Creating sqlite-database.db...")
 	file, err := os.Create("/mnt/ext1/sqlite-database.db") // Create SQLite file
 	if err != nil {
 		log.Fatal(err.Error())

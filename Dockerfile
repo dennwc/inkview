@@ -11,8 +11,8 @@ ADD ./patches/* /tmp/
 # download sources for that release and apply the patch
 # build a new toolchain and remove an old one
 RUN mkdir /gosrc \
- && curl --silent https://dl.google.com/go/go1.9.4.linux-amd64.tar.gz | tar xvzf - --directory=/ \
- && curl --silent https://dl.google.com/go/go1.9.4.src.tar.gz         | tar xvzf - --directory=/gosrc \
+ && curl --silent https://dl.google.com/go/go1.15.6.linux-amd64.tar.gz | tar xvzf - --directory=/ \
+ && curl --silent https://dl.google.com/go/go1.15.6.src.tar.gz         | tar xvzf - --directory=/gosrc \
  && patch /gosrc/go/src/cmd/go/internal/work/build.go < /tmp/go-pb.patch \
  && patch /gosrc/go/src/net/dnsconfig_unix.go < /tmp/dns-pb.patch \
  && cd /gosrc/go/src && GOROOT_BOOTSTRAP=/go ./make.bash  \
