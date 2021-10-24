@@ -19,11 +19,11 @@ func main() {
 		log.Fatal(err.Error())
 	}
 	file.Close()
-	log.Println("sqlite-database.db created")
+	log.Println("/mnt/ext1/sqlite-database.db created")
 
 	sqliteDatabase, _ := sql.Open("sqlite3", "/mnt/ext1/sqlite-database.db") // Open the created SQLite File
-	defer sqliteDatabase.Close()                                             // Defer Closing the database
-	createTable(sqliteDatabase)                                              // Create Database Tables
+	defer sqliteDatabase.Close()                                     // Defer Closing the database
+	createTable(sqliteDatabase)                                      // Create Database Tables
 
 	// INSERT RECORDS
 	insertStudent(sqliteDatabase, "0001", "Liana Kim", "Bachelor")

@@ -23,15 +23,21 @@ application to actually see an output of you program (like
 The second option is to wrap the program into `RunCLI` - it will
 emulate terminal output and write it to device display.
 
-## Preparation - Build the Docker Image
+## Preparation - Build or pull the Docker Image
 
-For your convenience there is a `docker-compose.yaml`.
+You can pull a docker images from dockerhub:
+
+```bash
+docker pull 5keeve/pocketbook-go-sdk:6.3.0-b288-v1
+```
+
+To build this image on your own, feel free to use `docker-compose.yaml`.
 
 ```bash
 docker-compose build
 ```
 
-will ctreate a `pb-go` container which can be used to compile a go program.
+This will create a `pb-go` service which can be used to compile a go program.
 
 Adjust the `source` path in `docker-compose.yaml` to your needs.
 
@@ -42,6 +48,10 @@ E.g.:
 ```bash
 docker-compose run --rm pb-go build ./sqlitetst.dir/sqlitetst.go
 ```
+
+**Note** In order to see some output for this, you need to run in using something like pbterm.
+If you just start it without pbterm you can verify successful execution by attaching your
+device to your computer and check for the presence of the file `sqlite-database.db`.
 
 ```bash
 docker-compose run --rm pb-go build ./devinfo/main.go

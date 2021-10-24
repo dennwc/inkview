@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   pb-go:
-    image: dennwc/pocketbook-go-sdk
+    image: 5keeve/pocketbook-go-sdk:6.3.0-b288-v1
     build:
       context: .
     entrypoint:
