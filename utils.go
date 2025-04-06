@@ -13,6 +13,8 @@ import (
 	"unsafe"
 )
 
+var defaultKeyboardLang = "en"
+
 func cbool(v bool) C.int {
 	if v {
 		return 1
@@ -109,4 +111,12 @@ func PowerOff() {
 
 func OpenMainMenu() {
 	C.OpenMainMenu()
+}
+
+func LoadKeyboard() {
+	C.LoadKeyboard(C.CString(defaultKeyboardLang))
+}
+
+func CloseKeyboard() {
+	C.CloseKeyboard()
 }
