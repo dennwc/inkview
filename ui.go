@@ -25,6 +25,10 @@ const (
 	Error    = Icon(C.ICON_ERROR)
 )
 
+func SetMessageDelay(time time.Duration) {
+	DefaultDelay = time
+}
+
 func Message(icon Icon, title, text string, dt time.Duration) {
 	if dt == 0 {
 		dt = DefaultDelay
