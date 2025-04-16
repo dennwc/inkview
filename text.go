@@ -11,6 +11,7 @@ import "C"
 import (
 	"image"
 	"image/color"
+	"unsafe"
 )
 
 const (
@@ -64,4 +65,40 @@ func StringWidth(s string) int {
 
 func SetTextStrength(n int) {
 	C.SetTextStrength(C.int(n))
+}
+
+func GetCurrentLang() string {
+	configs, err := GetConfig()
+	if err == nil {
+		lang, ok := configs["language"]
+		if ok {
+			return lang
+		}
+	}
+	return "en"
+}
+
+// Probably changes the language the app should run in, translations depend on it
+func LoadLanguage(lang string) {
+	cLang := C.CString(lang)
+	defer C.free(unsafe.Pointer(cLang))
+	C.LoadLanguage(cLang)
+}
+
+// Add translation text that will later be used in getLangText
+func AddTranslation(label, trans string) {
+	cLabel := C.CString(label)
+	defer C.free(unsafe.Pointer(cLabel))
+	cTrans := C.CString(trans)
+	defer C.free(unsafe.Pointer(cTrans))
+	C.AddTranslation(cLabel, cTrans)
+}
+
+// Get text with translation, translation variables can be found only in original pocketbook apps
+func GetLangText(s string) string {
+	cS := C.CString("@" + s)
+	defer C.free(unsafe.Pointer(cS))
+	cText := C.GetLangText(cS)
+	defer C.free(unsafe.Pointer(cText))
+	return C.GoString(cText)
 }

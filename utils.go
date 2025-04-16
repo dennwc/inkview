@@ -9,6 +9,9 @@ package ink
 import "C"
 
 import (
+	"bufio"
+	"os"
+	"strings"
 	"time"
 	"unsafe"
 )
@@ -113,10 +116,28 @@ func OpenMainMenu() {
 	C.OpenMainMenu()
 }
 
-func LoadKeyboard() {
-	C.LoadKeyboard(C.CString(defaultKeyboardLang))
-}
+func GetConfig() (map[string]string, error) {
+	file, err := os.Open(C.GLOBALCONFIGFILE)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
 
-func CloseKeyboard() {
-	C.CloseKeyboard()
+	configs := make(map[string]string)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, "=") {
+			parts := strings.Split(line, "=")
+			if len(parts) == 2 {
+				configs[parts[0]] = parts[1]
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return configs, nil
 }

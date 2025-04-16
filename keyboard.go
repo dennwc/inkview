@@ -26,6 +26,7 @@ func SetKeyboardHandler(kh KeyboardHandler) {
 	userKeyboardHandler = kh
 }
 
+// Open default keyboard
 func OpenKeyboard(placeholder string, buflen int) {
 
 	if buflen <= 0 {
@@ -45,6 +46,7 @@ func OpenKeyboard(placeholder string, buflen int) {
 	C.OpenKeyboard(ctitle, cbuffer, C.int(buflen), C.int(0), chandler)
 }
 
+// Open keyboard from .kbd file
 func OpenCustomKeyboard(keyboardFileName, placeholder string, buflen int) {
 
 	if buflen <= 0 {
@@ -64,6 +66,12 @@ func OpenCustomKeyboard(keyboardFileName, placeholder string, buflen int) {
 	C.OpenCustomKeyboard(C.CString(keyboardFileName), ctitle, cbuffer, C.int(buflen), C.int(0), chandler)
 }
 
+// Probably changes the keybaord language
+func LoadKeyboard() {
+	C.LoadKeyboard(C.CString(defaultKeyboardLang))
+}
+
+// Close keyboard layout
 func CloseKeyboard() {
 	C.CloseKeyboard()
 }
