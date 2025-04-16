@@ -721,6 +721,7 @@ int ScreenHeight();
 // For global settings: -1=auto (g-sensor)
 
 void SetOrientation(int n);
+void SetDefaultOrientation(int n); // Original pb apps prefer to use setDefaultOrientation (It's an undocumented function, found by reverse engineering)
 int GetOrientation();
 void SetGlobalOrientation(int n);
 int GetGlobalOrientation();
