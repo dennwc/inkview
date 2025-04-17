@@ -141,3 +141,12 @@ func GetConfig() (map[string]string, error) {
 
 	return configs, nil
 }
+
+// open the book in the default reader. If the .app file, then run the application
+func OpenBook(path string) {
+	C.OpenBook(C.CString(path), C.char(0), C.int(0))
+}
+
+func PageSnapshot() {
+	C.PageSnapshot()
+}

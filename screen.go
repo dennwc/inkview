@@ -56,6 +56,11 @@ func PartialUpdate(r image.Rectangle) {
 	C.PartialUpdate(C.int(r.Min.X), C.int(r.Min.Y), C.int(sz.X), C.int(sz.Y))
 }
 
+func PartialUpdateBW(r image.Rectangle) {
+	sz := r.Size()
+	C.PartialUpdateBW(C.int(r.Min.X), C.int(r.Min.Y), C.int(sz.X), C.int(sz.Y))
+}
+
 func SetOrientation(orientation Orientation) {
 	C.SetOrientation(C.int(orientation))
 }

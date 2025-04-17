@@ -80,3 +80,15 @@ func DrawTopPanel() {
 	// Taken from the original sudoku.app, a pattern was identified that in applications this code is responsible for rendering the top bar.
 	C.DrawPanel(nil, C.CString(""), C.CString(""), -1)
 }
+
+func ShowHourglass() {
+	C.ShowHourglass()
+}
+
+func ShowHourglassAt(p image.Point) {
+	C.ShowHourglass(C.int(p.X), C.int(p.Y))
+}
+
+func HideHourglass() {
+	C.HideHourglass()
+}
