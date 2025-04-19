@@ -5,6 +5,10 @@ package ink
 
 #cgo CFLAGS: -pthread
 #cgo LDFLAGS: -pthread -lpthread -linkview
+
+extern void c_rotate_handler(int direction);
+extern void c_dialog_handler(int button);
+
 */
 import "C"
 
@@ -16,6 +20,15 @@ import (
 )
 
 var DefaultDelay = time.Second
+
+type RotateBoxHandler func(Orientation)
+
+var userRotateBoxHandler RotateBoxHandler
+
+// return 1 for left button, 2 for right button. 1 for progressbar cancel button
+type DialogHandler func(button int)
+
+var userDialogHandler DialogHandler
 
 type Icon int
 
@@ -84,4 +97,61 @@ func DrawTopPanel() {
 	emptyStr := C.CString("")
 	defer C.free(unsafe.Pointer(emptyStr))
 	C.DrawPanel(nil, emptyStr, emptyStr, -1)
+}
+
+func OpenRotateBox() {
+	var rotateHandler C.iv_rotatehandler
+	rotateHandler = (C.iv_rotatehandler)(C.c_rotate_handler)
+	C.OpenRotateBox(rotateHandler)
+}
+
+func SetRotateBoxHandler(handler RotateBoxHandler) {
+	userRotateBoxHandler = handler
+}
+
+//export goRotateHandler
+func goRotateHandler(d C.int) {
+	userRotateBoxHandler(Orientation(d))
+}
+
+func Dialog(icon Icon, title, text, button1, button2 string) {
+	ctitle := C.CString(title)
+	defer C.free(unsafe.Pointer(ctitle))
+	ctext := C.CString(text)
+	defer C.free(unsafe.Pointer(ctext))
+	cbutton1 := C.CString(button1)
+	defer C.free(unsafe.Pointer(cbutton1))
+	cbutton2 := C.CString(button2)
+	defer C.free(unsafe.Pointer(cbutton2))
+
+	var dialogHandler C.iv_dialoghandler
+	dialogHandler = (C.iv_dialoghandler)(C.c_dialog_handler)
+
+	C.Dialog(C.int(icon), ctitle, ctext, cbutton1, cbutton2, dialogHandler)
+}
+
+//export goDialogHandler
+func goDialogHandler(button C.int) {
+	userDialogHandler(int(button))
+}
+
+// Use dialog handler for callback
+func OpenProgressbar(icon Icon, title, text string, percent int) {
+	ctitle := C.CString(title)
+	defer C.free(unsafe.Pointer(ctitle))
+	ctext := C.CString(text)
+	defer C.free(unsafe.Pointer(ctext))
+	var dialogHandler C.iv_dialoghandler
+	dialogHandler = (C.iv_dialoghandler)(C.c_dialog_handler)
+	C.OpenProgressbar(C.int(icon), ctitle, ctext, C.int(percent), dialogHandler)
+}
+
+func UpdateProgressbar(text string, percent int) {
+	ctext := C.CString(text)
+	defer C.free(unsafe.Pointer(ctext))
+	C.UpdateProgressbar(ctext, C.int(percent))
+}
+
+func CloseProgressbar() {
+	C.CloseProgressbar()
 }
