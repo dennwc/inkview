@@ -23,7 +23,9 @@ const (
 )
 
 func OpenFont(name string, size int, aa bool) *Font {
-	p := C.OpenFont(C.CString(name), C.int(size), cbool(aa))
+	cname := C.CString(name)
+	defer C.free(unsafe.Pointer(cname))
+	p := C.OpenFont(cname, C.int(size), cbool(aa))
 	if p == nil {
 		return nil
 	}
@@ -48,11 +50,15 @@ func (f *Font) Close() {
 }
 
 func DrawString(p image.Point, s string) {
-	C.DrawString(C.int(p.X), C.int(p.Y), C.CString(s))
+	cs := C.CString(s)
+	defer C.free(unsafe.Pointer(cs))
+	C.DrawString(C.int(p.X), C.int(p.Y), cs)
 }
 
 func DrawStringR(p image.Point, s string) {
-	C.DrawStringR(C.int(p.X), C.int(p.Y), C.CString(s))
+	cs := C.CString(s)
+	defer C.free(unsafe.Pointer(cs))
+	C.DrawStringR(C.int(p.X), C.int(p.Y), cs)
 }
 
 func CharWidth(c rune) int {
@@ -60,7 +66,9 @@ func CharWidth(c rune) int {
 }
 
 func StringWidth(s string) int {
-	return int(C.StringWidth(C.CString(s)))
+	cs := C.CString(s)
+	defer C.free(unsafe.Pointer(cs))
+	return int(C.StringWidth(cs))
 }
 
 func SetTextStrength(n int) {

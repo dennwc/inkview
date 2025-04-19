@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"image"
 	"time"
+	"unsafe"
 )
 
 var DefaultDelay = time.Second
@@ -33,8 +34,11 @@ func Message(icon Icon, title, text string, dt time.Duration) {
 	if dt == 0 {
 		dt = DefaultDelay
 	}
-	// void Message(int icon, const char *title, const char *text, int timeout);
-	C.Message(C.int(icon), C.CString(title), C.CString(text), C.int(dt/time.Millisecond))
+	ctitle := C.CString(title)
+	defer C.free(unsafe.Pointer(ctitle))
+	ctxt := C.CString(text)
+	defer C.free(unsafe.Pointer(ctxt))
+	C.Message(C.int(icon), ctitle, ctxt, C.int(dt/time.Millisecond))
 }
 
 func messagef(icon Icon, title, def, format string, args ...interface{}) {
@@ -77,8 +81,9 @@ func DisableExitHourglass() {
 }
 
 func DrawTopPanel() {
-	// Taken from the original sudoku.app, a pattern was identified that in applications this code is responsible for rendering the top bar.
-	C.DrawPanel(nil, C.CString(""), C.CString(""), -1)
+	emptyStr := C.CString("")
+	defer C.free(unsafe.Pointer(emptyStr))
+	C.DrawPanel(nil, emptyStr, emptyStr, -1)
 }
 
 func ShowHourglass() {

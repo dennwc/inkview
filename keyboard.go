@@ -63,12 +63,17 @@ func OpenCustomKeyboard(keyboardFileName, placeholder string, buflen int) {
 	var chandler C.iv_keyboardhandler
 	chandler = (C.iv_keyboardhandler)(C.c_keyboard_handler)
 
-	C.OpenCustomKeyboard(C.CString(keyboardFileName), ctitle, cbuffer, C.int(buflen), C.int(0), chandler)
+	cfileName := C.CString(keyboardFileName)
+	defer C.free(unsafe.Pointer(cfileName))
+
+	C.OpenCustomKeyboard(cfileName, ctitle, cbuffer, C.int(buflen), C.int(0), chandler)
 }
 
 // Probably changes the keybaord language
 func LoadKeyboard() {
-	C.LoadKeyboard(C.CString(defaultKeyboardLang))
+	keyboardLang := C.CString(defaultKeyboardLang)
+	defer C.free(unsafe.Pointer(keyboardLang))
+	C.LoadKeyboard(keyboardLang)
 }
 
 // Close keyboard layout
