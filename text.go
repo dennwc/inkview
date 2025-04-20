@@ -9,6 +9,7 @@ package ink
 import "C"
 
 import (
+	"fmt"
 	"image"
 	"image/color"
 	"unsafe"
@@ -80,7 +81,7 @@ func GetCurrentLang() string {
 	if err == nil {
 		lang, ok := configs["language"]
 		if ok {
-			return lang
+			return fmt.Sprintf("%v", lang)
 		}
 	}
 	return "en"
