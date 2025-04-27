@@ -8,6 +8,7 @@ package ink
 
 extern void c_rotate_handler(int direction);
 extern void c_dialog_handler(int button);
+extern void c_timeedit_handler(long time);
 
 */
 import "C"
@@ -29,6 +30,10 @@ var userRotateBoxHandler RotateBoxHandler
 type DialogHandler func(button int)
 
 var userDialogHandler DialogHandler
+
+type TimeEditHandler func(time time.Time)
+
+var userTimeEditHandler TimeEditHandler
 
 type Icon int
 
@@ -154,4 +159,21 @@ func UpdateProgressbar(text string, percent int) {
 
 func CloseProgressbar() {
 	C.CloseProgressbar()
+}
+
+func SetTimeEditHandler(handler TimeEditHandler) {
+	userTimeEditHandler = handler
+}
+
+//export goTimeEditHandler
+func goTimeEditHandler(t C.long) {
+	userTimeEditHandler(time.Unix(int64(t), 0))
+}
+
+func OpenTimeEdit(title string, x, y int, initime time.Time) {
+	ctitle := C.CString(title)
+	defer C.free(unsafe.Pointer(ctitle))
+	var timeEditHandler C.iv_timeedithandler
+	timeEditHandler = (C.iv_timeedithandler)(C.c_timeedit_handler)
+	C.OpenTimeEdit(ctitle, C.int(x), C.int(y), C.long(initime.Unix()), timeEditHandler)
 }

@@ -105,7 +105,7 @@ func AddTranslation(label, trans string) {
 
 // Get text with translation, translation variables can be found only in original pocketbook apps
 func GetLangText(s string) string {
-	cS := C.CString("@" + s)
+	cS := C.CString(s)
 	defer C.free(unsafe.Pointer(cS))
 	cText := C.GetLangText(cS)
 	defer C.free(unsafe.Pointer(cText))

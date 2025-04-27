@@ -15,3 +15,7 @@ void c_rotate_handler(int direction){
 void c_dialog_handler(int button){
     goDialogHandler(button);
 }
+
+void c_timeedit_handler(long newtime){
+    goTimeEditHandler(newtime);
+}
