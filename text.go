@@ -24,8 +24,8 @@ const (
 )
 
 func OpenFont(name string, size int, aa bool) *Font {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
+	cname, free := cString(name)
+	defer free()
 	p := C.OpenFont(cname, C.int(size), cbool(aa))
 	if p == nil {
 		return nil
@@ -51,14 +51,14 @@ func (f *Font) Close() {
 }
 
 func DrawString(p image.Point, s string) {
-	cs := C.CString(s)
-	defer C.free(unsafe.Pointer(cs))
+	cs, free := cString(s)
+	defer free()
 	C.DrawString(C.int(p.X), C.int(p.Y), cs)
 }
 
 func DrawStringR(p image.Point, s string) {
-	cs := C.CString(s)
-	defer C.free(unsafe.Pointer(cs))
+	cs, free := cString(s)
+	defer free()
 	C.DrawStringR(C.int(p.X), C.int(p.Y), cs)
 }
 
@@ -67,8 +67,8 @@ func CharWidth(c rune) int {
 }
 
 func StringWidth(s string) int {
-	cs := C.CString(s)
-	defer C.free(unsafe.Pointer(cs))
+	cs, free := cString(s)
+	defer free()
 	return int(C.StringWidth(cs))
 }
 
@@ -89,24 +89,24 @@ func GetCurrentLang() string {
 
 // Probably changes the language the app should run in, translations depend on it
 func LoadLanguage(lang string) {
-	cLang := C.CString(lang)
-	defer C.free(unsafe.Pointer(cLang))
+	cLang, free := cString(lang)
+	defer free()
 	C.LoadLanguage(cLang)
 }
 
 // Add translation text that will later be used in getLangText
 func AddTranslation(label, trans string) {
-	cLabel := C.CString(label)
-	defer C.free(unsafe.Pointer(cLabel))
-	cTrans := C.CString(trans)
-	defer C.free(unsafe.Pointer(cTrans))
+	cLabel, free := cString(label)
+	defer free()
+	cTrans, free2 := cString(trans)
+	defer free2()
 	C.AddTranslation(cLabel, cTrans)
 }
 
 // Get text with translation, translation variables can be found only in original pocketbook apps
 func GetLangText(s string) string {
-	cS := C.CString(s)
-	defer C.free(unsafe.Pointer(cS))
+	cS, free := cString(s)
+	defer free()
 	cText := C.GetLangText(cS)
 	defer C.free(unsafe.Pointer(cText))
 	return C.GoString(cText)

@@ -17,7 +17,6 @@ import (
 	"fmt"
 	"image"
 	"time"
-	"unsafe"
 )
 
 var DefaultDelay = time.Second
@@ -52,10 +51,10 @@ func Message(icon Icon, title, text string, dt time.Duration) {
 	if dt == 0 {
 		dt = DefaultDelay
 	}
-	ctitle := C.CString(title)
-	defer C.free(unsafe.Pointer(ctitle))
-	ctxt := C.CString(text)
-	defer C.free(unsafe.Pointer(ctxt))
+	ctitle, free := cString(title)
+	defer free()
+	ctxt, free2 := cString(text)
+	defer free2()
 	C.Message(C.int(icon), ctitle, ctxt, C.int(dt/time.Millisecond))
 }
 
@@ -99,8 +98,8 @@ func DisableExitHourglass() {
 }
 
 func DrawTopPanel() {
-	emptyStr := C.CString("")
-	defer C.free(unsafe.Pointer(emptyStr))
+	emptyStr, free := cString("")
+	defer free()
 	C.DrawPanel(nil, emptyStr, emptyStr, -1)
 }
 
@@ -120,14 +119,14 @@ func goRotateHandler(d C.int) {
 }
 
 func Dialog(icon Icon, title, text, button1, button2 string) {
-	ctitle := C.CString(title)
-	defer C.free(unsafe.Pointer(ctitle))
-	ctext := C.CString(text)
-	defer C.free(unsafe.Pointer(ctext))
-	cbutton1 := C.CString(button1)
-	defer C.free(unsafe.Pointer(cbutton1))
-	cbutton2 := C.CString(button2)
-	defer C.free(unsafe.Pointer(cbutton2))
+	ctitle, free1 := cString(title)
+	defer free1()
+	ctext, free2 := cString(text)
+	defer free2()
+	cbutton1, free3 := cString(button1)
+	defer free3()
+	cbutton2, free4 := cString(button2)
+	defer free4()
 
 	var dialogHandler C.iv_dialoghandler
 	dialogHandler = (C.iv_dialoghandler)(C.c_dialog_handler)
@@ -142,18 +141,18 @@ func goDialogHandler(button C.int) {
 
 // Use dialog handler for callback
 func OpenProgressbar(icon Icon, title, text string, percent int) {
-	ctitle := C.CString(title)
-	defer C.free(unsafe.Pointer(ctitle))
-	ctext := C.CString(text)
-	defer C.free(unsafe.Pointer(ctext))
+	ctitle, free := cString(title)
+	defer free()
+	ctext, free2 := cString(text)
+	defer free2()
 	var dialogHandler C.iv_dialoghandler
 	dialogHandler = (C.iv_dialoghandler)(C.c_dialog_handler)
 	C.OpenProgressbar(C.int(icon), ctitle, ctext, C.int(percent), dialogHandler)
 }
 
 func UpdateProgressbar(text string, percent int) {
-	ctext := C.CString(text)
-	defer C.free(unsafe.Pointer(ctext))
+	ctext, free := cString(text)
+	defer free()
 	C.UpdateProgressbar(ctext, C.int(percent))
 }
 
@@ -170,10 +169,10 @@ func goTimeEditHandler(t C.long) {
 	userTimeEditHandler(time.Unix(int64(t), 0))
 }
 
-func OpenTimeEdit(title string, x, y int, initime time.Time) {
-	ctitle := C.CString(title)
-	defer C.free(unsafe.Pointer(ctitle))
+func OpenTimeEdit(title string, p image.Point, initime time.Time) {
+	ctitle, free := cString(title)
+	defer free()
 	var timeEditHandler C.iv_timeedithandler
 	timeEditHandler = (C.iv_timeedithandler)(C.c_timeedit_handler)
-	C.OpenTimeEdit(ctitle, C.int(x), C.int(y), C.long(initime.Unix()), timeEditHandler)
+	C.OpenTimeEdit(ctitle, C.int(p.X), C.int(p.Y), C.long(initime.Unix()), timeEditHandler)
 }

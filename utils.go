@@ -127,11 +127,8 @@ func GetConfig() (map[string]string, error) {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		line := scanner.Text()
-		if strings.Contains(line, "=") {
-			parts := strings.Split(line, "=")
-			if len(parts) == 2 {
-				configs[parts[0]] = parts[1]
-			}
+		if parts := strings.SplitN(line, "=", 2); len(parts) == 2 {
+			configs[parts[0]] = parts[1]
 		}
 	}
 
@@ -144,9 +141,18 @@ func GetConfig() (map[string]string, error) {
 
 // open the book in the default reader. If the .app file, then run the application
 func OpenBook(path string) {
-	C.OpenBook(C.CString(path), (*C.char)(nil), C.int(0))
+	cPath, free := cString(path)
+	defer free()
+	C.OpenBook(cPath, (*C.char)(nil), C.int(0))
 }
 
 func PageSnapshot() {
 	C.PageSnapshot()
+}
+
+func cString(str string) (*C.char, func()) {
+	cstr := C.CString(str)
+	return cstr, func() {
+		C.free(unsafe.Pointer(cstr))
+	}
 }

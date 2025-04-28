@@ -11,7 +11,6 @@ import "C"
 import (
 	"errors"
 	"fmt"
-	"unsafe"
 )
 
 // HwAddress returns device MAC address.
@@ -52,8 +51,8 @@ func netError(e C.int) error {
 }
 
 func Connect(name string) error {
-	cname := C.CString(name)
-	defer C.free(unsafe.Pointer(cname))
+	cname, free := cString(name)
+	defer free()
 	e := C.NetConnect(cname)
 	return netError(e)
 }

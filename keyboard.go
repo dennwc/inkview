@@ -15,8 +15,12 @@ import (
 
 //export goKeyboardHandler
 func goKeyboardHandler(text *C.char) {
+
 	userKeyboardHandler(C.GoString(text))
+	keyboardBuffer = []byte{}
 }
+
+var keyboardBuffer []byte
 
 type KeyboardHandler func(string)
 
@@ -33,12 +37,12 @@ func OpenKeyboard(placeholder string, buflen int) {
 		buflen = 1024
 	}
 
-	buffer := make([]byte, buflen)
+	keyboardBuffer := make([]byte, buflen)
 
-	ctitle := C.CString(placeholder)
-	defer C.free(unsafe.Pointer(ctitle))
+	ctitle, free := cString(placeholder)
+	defer free()
 
-	cbuffer := (*C.char)(unsafe.Pointer(&buffer[0]))
+	cbuffer := (*C.char)(unsafe.Pointer(&keyboardBuffer[0]))
 
 	var chandler C.iv_keyboardhandler
 	chandler = (C.iv_keyboardhandler)(C.c_keyboard_handler)
@@ -53,26 +57,26 @@ func OpenCustomKeyboard(keyboardFileName, placeholder string, buflen int) {
 		buflen = 1024
 	}
 
-	buffer := make([]byte, buflen)
+	keyboardBuffer := make([]byte, buflen)
 
-	ctitle := C.CString(placeholder)
-	defer C.free(unsafe.Pointer(ctitle))
+	ctitle, free := cString(placeholder)
+	defer free()
 
-	cbuffer := (*C.char)(unsafe.Pointer(&buffer[0]))
+	cbuffer := (*C.char)(unsafe.Pointer(&keyboardBuffer[0]))
 
 	var chandler C.iv_keyboardhandler
 	chandler = (C.iv_keyboardhandler)(C.c_keyboard_handler)
 
-	cfileName := C.CString(keyboardFileName)
-	defer C.free(unsafe.Pointer(cfileName))
+	cfileName, free2 := cString(keyboardFileName)
+	defer free2()
 
 	C.OpenCustomKeyboard(cfileName, ctitle, cbuffer, C.int(buflen), C.int(0), chandler)
 }
 
 // Probably changes the keybaord language
 func LoadKeyboard() {
-	keyboardLang := C.CString(defaultKeyboardLang)
-	defer C.free(unsafe.Pointer(keyboardLang))
+	keyboardLang, free := cString(defaultKeyboardLang)
+	defer free()
 	C.LoadKeyboard(keyboardLang)
 }
 
