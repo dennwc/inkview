@@ -134,6 +134,10 @@ func Dialog(icon Icon, title, text, button1, button2 string) {
 	C.Dialog(C.int(icon), ctitle, ctext, cbutton1, cbutton2, dialogHandler)
 }
 
+func SetDialogHandler(handler DialogHandler) {
+	userDialogHandler = handler
+}
+
 //export goDialogHandler
 func goDialogHandler(button C.int) {
 	userDialogHandler(int(button))
