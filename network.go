@@ -86,3 +86,18 @@ func KeepNetwork() (func(), error) {
 	}
 	return nil, last
 }
+
+// Obtained through reverse engineering, automatically connecting to the network and maintaining an active connection
+// requires passing null instead of the network name. You should first use QueryNetwork.
+// If not connected display network select or warning message, return error if connection failed
+func ConnectDefault() error {
+	if int(C.NetConnect(nil)) != 0 {
+		return errors.New("Can't connect network")
+	}
+
+	return nil
+}
+
+func QueryNetwork() {
+	C.QueryNetwork()
+}
