@@ -37,7 +37,7 @@ func OpenKeyboard(placeholder string, buflen int) {
 		buflen = 1024
 	}
 
-	keyboardBuffer := make([]byte, buflen)
+	keyboardBuffer = make([]byte, buflen)
 
 	ctitle, free := cString(placeholder)
 	defer free()
@@ -57,7 +57,7 @@ func OpenCustomKeyboard(keyboardFileName, placeholder string, buflen int) {
 		buflen = 1024
 	}
 
-	keyboardBuffer := make([]byte, buflen)
+	keyboardBuffer = make([]byte, buflen)
 
 	ctitle, free := cString(placeholder)
 	defer free()
