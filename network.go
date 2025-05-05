@@ -51,7 +51,9 @@ func netError(e C.int) error {
 }
 
 func Connect(name string) error {
-	e := C.NetConnect(C.CString(name))
+	cname, free := cString(name)
+	defer free()
+	e := C.NetConnect(cname)
 	return netError(e)
 }
 

@@ -55,3 +55,29 @@ func PartialUpdate(r image.Rectangle) {
 	sz := r.Size()
 	C.PartialUpdate(C.int(r.Min.X), C.int(r.Min.Y), C.int(sz.X), C.int(sz.Y))
 }
+
+func PartialUpdateBW(r image.Rectangle) {
+	sz := r.Size()
+	C.PartialUpdateBW(C.int(r.Min.X), C.int(r.Min.Y), C.int(sz.X), C.int(sz.Y))
+}
+
+func SetOrientation(orientation Orientation) {
+	C.SetOrientation(C.int(orientation))
+}
+
+// Original pb apps prefer to use setDefaultOrientation on init action (It's an undocumented function, found by reverse engineering)
+func SetDefaultOrientation(orientation Orientation) {
+	C.SetOrientation(C.int(orientation))
+}
+
+func GetOrientation() Orientation {
+	return Orientation(C.GetOrientation())
+}
+
+func SetGlobalOrientation(orientation Orientation) {
+	C.SetGlobalOrientation(C.int(orientation))
+}
+
+func GetGlobalOrientation() Orientation {
+	return Orientation(C.GetOrientation())
+}

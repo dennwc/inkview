@@ -9,6 +9,9 @@ package ink
 import "C"
 
 import (
+	"bufio"
+	"os"
+	"strings"
 	"time"
 	"unsafe"
 )
@@ -113,10 +116,43 @@ func OpenMainMenu() {
 	C.OpenMainMenu()
 }
 
-func LoadKeyboard() {
-	C.LoadKeyboard(C.CString(defaultKeyboardLang))
+func GetConfig() (map[string]string, error) {
+	file, err := os.Open(C.GLOBALCONFIGFILE)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	configs := make(map[string]string)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		if parts := strings.SplitN(line, "=", 2); len(parts) == 2 {
+			configs[parts[0]] = parts[1]
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	return configs, nil
 }
 
-func CloseKeyboard() {
-	C.CloseKeyboard()
+// open the book in the default reader. If the .app file, then run the application
+func OpenBook(path string) {
+	cPath, free := cString(path)
+	defer free()
+	C.OpenBook(cPath, (*C.char)(nil), C.int(0))
+}
+
+func PageSnapshot() {
+	C.PageSnapshot()
+}
+
+func cString(str string) (*C.char, func()) {
+	cstr := C.CString(str)
+	return cstr, func() {
+		C.free(unsafe.Pointer(cstr))
+	}
 }

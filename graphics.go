@@ -80,3 +80,8 @@ func DrawSelection(r image.Rectangle, cl color.Color) {
 	sz := r.Size()
 	C.DrawSelection(C.int(r.Min.X), C.int(r.Min.Y), C.int(sz.X), C.int(sz.Y), C.int(colorToInt(cl)))
 }
+
+// https://en.wikipedia.org/wiki/Dither
+func DitherArea(r image.Rectangle, levels int, method int) {
+	C.DitherArea(C.int(r.Min.X), C.int(r.Min.Y), C.int(r.Max.X), C.int(r.Max.Y), C.int(levels), C.int(method))
+}
