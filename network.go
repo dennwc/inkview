@@ -11,7 +11,10 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"sync"
 )
+
+var queryNetworkOnce sync.Once
 
 // HwAddress returns device MAC address.
 func HwAddress() string {
@@ -90,9 +93,14 @@ func KeepNetwork() (func(), error) {
 }
 
 // Obtained through reverse engineering, automatically connecting to the network and maintaining an active connection
-// requires passing null instead of the network name. You should first use QueryNetwork.
+// requires passing null instead of the network name.
 // If not connected display network select or warning message, return error if connection failed
 func ConnectDefault() error {
+
+	queryNetworkOnce.Do(func() {
+		QueryNetwork()
+	})
+
 	if int(C.NetConnect(nil)) != 0 {
 		return errors.New("Can't connect network")
 	}
