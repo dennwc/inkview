@@ -57,7 +57,19 @@ device to your computer and check for the presence of the file `sqlite-database.
 docker-compose run --rm pb-go build ./devinfo/main.go
 ```
 
+
 Alternatively, after building the image, `docker` can be used to compile without adjusting the file.
+
+```
+docker run --rm -v $(PATH_TO_PROJECT):/app 5keeve/pocketbook-go-sdk:6.3.0-b288-v1 build -o $(APP_NAME).app
+```
+
+Or there is an alternative image with newer versions of Goland: `sunsung/pocketbook-go-sdk:latest`
+
+```
+docker run --rm -v $(PATH_TO_PROJECT):/app sunsung/pocketbook-go-sdk:latest build -o $(APP_NAME).app .
+```
+
 
 ## Build an app with UI
 
